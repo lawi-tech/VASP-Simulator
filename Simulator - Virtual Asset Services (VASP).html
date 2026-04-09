@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulator — Virtual Asset Services | BCB</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fafafa; color: #2c2c2c; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; border-bottom: 1px solid #e0e0e0; padding: 2rem; position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 2rem; }
+        .header-text { flex: 1; }
+        .header-logo { flex-shrink: 0; width: 120px; height: 48px; display: flex; align-items: center; justify-content: center; }
+        .header-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .header-logo .logo-placeholder { width: 120px; height: 48px; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #bbb; text-transform: uppercase; letter-spacing: 0.5px; }
+        .title { font-size: 1.5rem; font-weight: 300; color: #1a1a1a; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
+        .subtitle { font-size: 0.85rem; color: #666; line-height: 1.5; }
+        .progress-bar { background: white; border-bottom: 1px solid #e0e0e0; padding: 1.5rem 2rem; }
+        .progress-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .progress-steps { display: flex; gap: 2rem; flex: 1; }
+        .progress-step { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; position: relative; cursor: pointer; transition: color 0.2s; }
+        .progress-step:hover { color: #666; }
+        .progress-step.active { color: #1a1a1a; }
+        .progress-step.active::after { content: ''; position: absolute; bottom: -1.5rem; left: 0; right: 0; height: 2px; background: #1a1a1a; }
+        .progress-step.completed { color: #4a9; }
+        .progress-step.completed::before { content: '✓ '; }
+        .progress-indicator { font-size: 0.75rem; color: #999; font-family: 'Courier New', monospace; }
+        .main-content { padding: 3rem 2rem; }
+        .section { display: none; } .section.active { display: block; }
+        .form-card { background: white; border: 1px solid #e0e0e0; padding: 3rem; margin-bottom: 2rem; }
+        .section-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #f0f0f0; }
+        .section-number { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 0.5rem; }
+        .section-title { font-size: 1.3rem; font-weight: 300; color: #1a1a1a; margin-bottom: 0.75rem; letter-spacing: -0.3px; }
+        .section-legal-ref { font-size: 0.7rem; color: #999; font-family: 'Courier New', monospace; margin-top: 0.5rem; }
+        .section-description { font-size: 0.85rem; color: #666; line-height: 1.6; }
+        .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 0.75rem; }
+        .radio-option, .checkbox-option { display: flex; align-items: center; padding: 1rem; background: #fafafa; border: 1px solid #e8e8e8; cursor: pointer; transition: all 0.2s ease; }
+        .radio-option:hover, .checkbox-option:hover { background: white; border-color: #d0d0d0; }
+        .radio-option.selected, .checkbox-option.selected { background: white; border-color: #1a1a1a; }
+        .radio-option.disabled, .checkbox-option.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+        .radio-option input, .checkbox-option input { margin-right: 1rem; flex-shrink: 0; }
+        .option-content { flex: 1; } .option-title { font-size: 0.9rem; color: #1a1a1a; margin-bottom: 0.25rem; }
+        .option-description { font-size: 0.75rem; color: #999; }
+        .option-value { font-size: 0.7rem; color: #1a1a1a; font-family: 'Courier New', monospace; margin-top: 0.25rem; }
+        .form-navigation { display: flex; justify-content: space-between; gap: 1rem; padding-top: 2rem; border-top: 1px solid #f0f0f0; }
+        .btn { padding: 0.75rem 2rem; border: 1px solid #e0e0e0; background: white; font-size: 0.85rem; color: #1a1a1a; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn:hover { background: #fafafa; } .btn-primary { background: #1a1a1a; color: white; border-color: #1a1a1a; } .btn-primary:hover { background: #2c2c2c; } .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .info-box { background: #f8f8f8; border-left: 2px solid #1a1a1a; padding: 1.5rem; margin: 1.5rem 0; }
+        .info-box-title { font-size: 0.8rem; color: #1a1a1a; margin-bottom: 0.5rem; font-weight: 500; }
+        .info-box-text { font-size: 0.75rem; color: #666; line-height: 1.6; }
+        .info-box.warning { background: #fffbf0; border-left-color: #f0ad4e; } .info-box.critical { background: #fff5f5; border-left-color: #cc0000; } .info-box.success { background: #f0fff4; border-left-color: #4a9; }
+        .status-badge { display: inline-block; padding: 0.25rem 0.75rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid; margin-left: 0.5rem; }
+        .status-badge.critical { background: #fff5f5; border-color: #ffdddd; color: #cc0000; }
+        .status-badge.legal-ref { background: #f8f8f8; border-color: #f0f0f0; color: #999; font-family: 'Courier New', monospace; }
+        .question-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; } .question-row { border-bottom: 1px solid #f0f0f0; } .question-cell { padding: 1.5rem 0; }
+        .question-number { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 0.5rem; }
+        .question-title { font-size: 0.9rem; color: #1a1a1a; margin-bottom: 0.5rem; } .question-context { font-size: 0.75rem; color: #666; margin-bottom: 0.75rem; line-height: 1.6; }
+        .result-panel { background: white; border: 2px solid #1a1a1a; padding: 2.5rem; margin: 2rem 0; }
+        .result-title { font-size: 1.1rem; font-weight: 300; color: #1a1a1a; margin-bottom: 1.5rem; } .result-value { font-size: 2.5rem; font-weight: 300; color: #1a1a1a; font-family: 'Courier New', monospace; margin-bottom: 0.5rem; } .result-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 2rem; }
+        .breakdown-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; } .breakdown-table th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: #999; padding: 0.75rem 0; border-bottom: 1px solid #e0e0e0; font-weight: 400; } .breakdown-table td { padding: 0.75rem 0; font-size: 0.85rem; border-bottom: 1px solid #f0f0f0; } .breakdown-table td:last-child { text-align: right; font-family: 'Courier New', monospace; font-size: 0.8rem; } .breakdown-table tr.total td { border-top: 2px solid #1a1a1a; font-weight: 500; border-bottom: none; padding-top: 1rem; } .breakdown-table .ref { font-size: 0.65rem; color: #999; font-family: 'Courier New', monospace; display: block; margin-top: 0.25rem; }
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; } .comparison-card { background: #fafafa; border: 1px solid #e8e8e8; padding: 2rem; } .comparison-card.highlighted { border-color: #1a1a1a; background: white; } .comparison-card-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 0.75rem; } .comparison-card-value { font-size: 1.8rem; font-weight: 300; font-family: 'Courier New', monospace; color: #1a1a1a; margin-bottom: 0.5rem; } .comparison-card-detail { font-size: 0.75rem; color: #666; line-height: 1.6; }
+        .validation-tag { display: inline-block; font-size: 0.65rem; padding: 0.2rem 0.5rem; border: 1px solid; margin-left: 0.5rem; vertical-align: middle; } .validation-tag.blocked { background: #fff5f5; border-color: #ffdddd; color: #cc0000; }
+        @media (max-width: 768px) { .progress-steps { flex-wrap: wrap; gap: 1rem; } .form-card { padding: 1.5rem; } .result-value { font-size: 1.8rem; } .comparison-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="header-inner">
+        <div class="header-text">
+            <div class="title">Simulator — Virtual Asset Services</div>
+            <div class="subtitle">Methodology per Joint Resolution CMN/BCB No. 14/2025 c/c BCB Resolution No. 517/2025 | Applicable to SPSAVs and FX Brokers (CTVMs, DTVMs and Banks under validation)</div>
+        </div>
+        <div class="header-logo">
+            <!-- Replace the placeholder below with: <img src="logo.png" alt="Lawi"> -->
+            <div class="logo-placeholder">Logo</div>
+        </div>
+    </div>
+</div>
+<div class="progress-bar"><div class="progress-content">
+    <div class="progress-steps">
+        <div class="progress-step active" id="step-1" onclick="nav(1)">Entity Type</div>
+        <div class="progress-step" id="step-2" onclick="nav(2)">Activities</div>
+        <div class="progress-step" id="step-3" onclick="nav(3)">Investment</div>
+        <div class="progress-step" id="step-4" onclick="nav(4)">Funding</div>
+        <div class="progress-step" id="step-5" onclick="nav(5)">Result</div>
+    </div>
+    <div class="progress-indicator"><span id="csn">01</span> / 05</div>
+</div></div>
+<div class="main-content"><div class="container">
+
+<!-- S1 -->
+<div class="section active" id="section-1"><div class="form-card">
+    <div class="section-header">
+        <div class="section-number">Step 01 / 05</div><div class="section-title">Entity Type</div>
+        <div class="section-legal-ref">BCB Res. 519/2025 art. 1 | BCB Res. 520/2025 art. 20 | BCB Res. 542/2025</div>
+        <div class="section-description">Select the institution type. This determines permitted activities and authorization requirements. Only institutions in art. 20 of BCB Res. 520/2025 may provide virtual asset intermediation and custody services, in addition to SPSAVs.</div>
+    </div>
+    <div class="info-box"><div class="info-box-title">Functional Criterion (BCB Vote No. 141/2025)</div><div class="info-box-text">The new methodology adopts the principle "same activity, same risk, same rules." Minimum capital is calculated based on operational activities effectively performed, regardless of entity type.</div></div>
+    <table class="question-table"><tr class="question-row"><td class="question-cell">
+        <div class="question-number">S1.1 <span class="status-badge critical">Required</span></div>
+        <div class="question-title">Institution type</div>
+        <div class="radio-group" id="etg">
+            <label class="radio-option"><input type="radio" name="et" value="spsav_intermediaria"><div class="option-content"><div class="option-title">SPSAV — Virtual Asset Intermediary</div><div class="option-description">Intermediation of virtual assets: buy/sell/swap, portfolio management, FX market operations (eFX). Two-phase BCB authorization.</div><div class="option-value">BCB Res. 520, arts. 6-7 | BCB Res. 517, art. 3(II)(c)</div></div></label>
+            <label class="radio-option"><input type="radio" name="et" value="spsav_custodiante"><div class="option-content"><div class="option-title">SPSAV — Virtual Asset Custodian</div><div class="option-description">Custody of virtual assets: safekeeping, control, record maintenance, event handling. Two-phase BCB authorization.</div><div class="option-value">BCB Res. 520, arts. 8-9 | BCB Res. 517, art. 3(III)(d)</div></div></label>
+            <label class="radio-option"><input type="radio" name="et" value="spsav_corretora"><div class="option-content"><div class="option-title">SPSAV — Virtual Exchange</div><div class="option-description">Combined intermediation and custody. Two-phase BCB authorization.</div><div class="option-value">BCB Res. 520, art. 10 | BCB Res. 517, art. 3(II)(d), 3(III)(c)</div></div></label>
+            <label class="radio-option"><input type="radio" name="et" value="corretora_cambio"><div class="option-content"><div class="option-title">FX Broker (Sociedade Corretora de Câmbio)</div><div class="option-description">FX intermediation + virtual asset intermediation only (no custody). Registers eFX in SISBACEN. Communication to BCB + 90 days.</div><div class="option-value">BCB Res. 542/2025, arts. 2-3 | BCB Res. 520, art. 20(II) | BCB Res. 517, art. 3(II)(e)</div></div></label>
+            <label class="radio-option disabled" style="opacity:0.4;cursor:not-allowed;pointer-events:none;"><input type="radio" name="et" value="ctvm" disabled><div class="option-content"><div class="option-title">CTVM — Securities Broker <span class="status-badge legal-ref">Under validation</span></div><div class="option-description">Intermediation + custody of virtual assets (BCB Res. 520, art. 20, II). May operate virtual asset margin accounts (art. 72). Corporate purpose per CMN Res. 5,008/2022. Capital criteria under validation.</div><div class="option-value">CMN Res. 5,008/2022 | BCB Res. 517, art. 3(II)(f), 3(III)(a) | Coming soon</div></div></label>
+            <label class="radio-option disabled" style="opacity:0.4;cursor:not-allowed;pointer-events:none;"><input type="radio" name="et" value="dtvm" disabled><div class="option-content"><div class="option-title">DTVM — Securities Distributor <span class="status-badge legal-ref">Under validation</span></div><div class="option-description">Intermediation + custody of virtual assets (BCB Res. 520, art. 20, II). May operate virtual asset margin accounts (art. 72). Corporate purpose per CMN Res. 5,008/2022. Capital criteria under validation.</div><div class="option-value">CMN Res. 5,008/2022 | BCB Res. 517, art. 3(II)(g), 3(III)(b) | Coming soon</div></div></label>
+            <label class="radio-option disabled" style="opacity:0.4;cursor:not-allowed;pointer-events:none;"><input type="radio" name="et" value="banco" disabled><div class="option-content"><div class="option-title">Bank (Commercial, Multiple, Investment, FX) <span class="status-badge legal-ref">Under validation</span></div><div class="option-description">Intermediation + custody of virtual assets (BCB Res. 520, art. 20, I). Banks span multiple activity categories (credit, intermediation, custody, services) requiring comprehensive cross-referencing with BCB Res. 517.</div><div class="option-value">BCB Res. 520, art. 20(I) | BCB Res. 517, art. 3 (multiple) | Coming soon</div></div></label>
+        </div>
+        <div class="info-box warning" id="ew" style="display:none;margin-top:1.5rem;"><div class="info-box-title" id="ewt"></div><div class="info-box-text" id="ewx"></div></div>
+    </td></tr>
+    <tr class="question-row"><td class="question-cell">
+        <div class="question-number">S1.2</div><div class="question-title">Current entity status</div>
+        <div class="question-context">Determines applicability of the transition rule under art. 12 of Joint Resolution No. 14/2025.</div>
+        <div class="radio-group">
+            <label class="radio-option"><input type="radio" name="es" value="new"><div class="option-content"><div class="option-title">New entrant — no prior authorization</div><div class="option-description">Transition rule DOES NOT apply. Full minimum capital required from filing.</div></div></label>
+            <label class="radio-option"><input type="radio" name="es" value="operating_before"><div class="option-content"><div class="option-title">Operating before 11/04/2025</div><div class="option-description">Transition rule may apply (art. 12, Joint Res. 14). Progressive adjustment until 06/30/2028.</div></div></label>
+            <label class="radio-option"><input type="radio" name="es" value="spsav_active"><div class="option-content"><div class="option-title">SPSAV — active before 02/02/2026, without BCB authorization</div><div class="option-description">Transition rule DOES NOT apply. No prior capital regulation for SPSAVs. Full capital at filing.</div></div></label>
+        </div>
+    </td></tr></table>
+    <div class="form-navigation"><button class="btn" disabled>Previous</button><button class="btn btn-primary" onclick="nav(2)">Next Step</button></div>
+</div></div>
+
+<!-- S2 -->
+<div class="section" id="section-2"><div class="form-card">
+    <div class="section-header">
+        <div class="section-number">Step 02 / 05</div><div class="section-title">Operational Activity Categories</div>
+        <div class="section-legal-ref">Joint Res. 14/2025, art. 9 (Portion I) | BCB Res. 517/2025, arts. 2-4</div>
+        <div class="section-description">Select operational activity categories. Each adds R$ 2,000,000 to Portion I (Cost). Categories per BCB Res. 517/2025, art. 2. Incompatible activities are blocked.</div>
+    </div>
+    <table class="question-table"><tr class="question-row"><td class="question-cell">
+        <div class="question-number">S2.1 <span class="status-badge legal-ref">Art. 9, I</span></div>
+        <div class="question-title">Activity categories reported to BCB</div>
+        <div class="checkbox-group" id="ag">
+            <label class="checkbox-option" id="opt-servico"><input type="checkbox" name="act" value="servico"><div class="option-content"><div class="option-title">Services</div><div class="option-description">Non-financial-flow services or services on behalf of third parties: advisory, technical assistance, data aggregation, fiduciary agent, payment initiation, etc. — BCB Res. 517, art. 2(IV)</div><div class="option-value">+R$ 2,000,000 to cost</div></div></label>
+            <label class="checkbox-option" id="opt-custodia"><input type="checkbox" name="act" value="custodia"><div class="option-content"><div class="option-title">Custody & Administration of Third-Party Resources</div><div class="option-description">Custody of securities/virtual assets; professional management of third-party assets; fund/portfolio administration — BCB Res. 517, art. 2(III)</div><div class="option-value">+R$ 2,000,000 to cost</div></div></label>
+            <label class="checkbox-option" id="opt-intermediacao"><input type="checkbox" name="act" value="intermediacao"><div class="option-content"><div class="option-title">Intermediation</div><div class="option-description">Buy/sell on behalf of third parties (securities, FX, virtual assets); electronic money issuance; payments & international transfers; credentialing — BCB Res. 517, art. 2(II)</div><div class="option-value">+R$ 2,000,000 to cost</div></div></label>
+            <label class="checkbox-option disabled" id="opt-credito" style="opacity:0.35;cursor:not-allowed;pointer-events:none;"><input type="checkbox" name="act" value="credito" disabled><div class="option-content"><div class="option-title">Credit Granting <span class="validation-tag blocked">DISABLED</span></div><div class="option-description">Loans, financing, advances, credit limits, leasing, guarantees, receivables acquisition — BCB Res. 517, art. 2(I). Prohibited for SPSAVs (art. 12, I, Res. 520) and FX Brokers (art. 7, I, Res. 542). Under validation for other entity types.</div><div class="option-value">+R$ 2,000,000 to cost | Not available in this version</div></div></label>
+        </div>
+    </td></tr>
+    <tr class="question-row"><td class="question-cell">
+        <div class="question-number">S2.2 <span class="status-badge legal-ref">Art. 9, II</span></div>
+        <div class="question-title">Technology infrastructure surcharge</div>
+        <div class="question-context">+R$ 5,000,000 per service requiring intensive tech infrastructure (BCB Res. 517, art. 4). Capped at R$ 10,000,000.</div>
+        <div class="checkbox-group" id="ig">
+            <label class="checkbox-option"><input type="checkbox" name="infra" value="baas"><div class="option-content"><div class="option-title">Banking as a Service (BaaS)</div><div class="option-value">+R$ 5,000,000 | art. 4(I)</div></div></label>
+            <label class="checkbox-option"><input type="checkbox" name="infra" value="of"><div class="option-content"><div class="option-title">Open Finance data aggregation</div><div class="option-value">+R$ 5,000,000 | art. 4(II)</div></div></label>
+            <label class="checkbox-option"><input type="checkbox" name="infra" value="ds"><div class="option-content"><div class="option-title">Data sharing with non-authorized entities</div><div class="option-value">+R$ 5,000,000 | art. 4(III)</div></div></label>
+            <label class="checkbox-option"><input type="checkbox" name="infra" value="pix"><div class="option-content"><div class="option-title">Pix transactional account provision</div><div class="option-value">+R$ 5,000,000 | art. 4(IV)</div></div></label>
+            <label class="checkbox-option"><input type="checkbox" name="infra" value="pixl"><div class="option-content"><div class="option-title">Pix settlement service (cooperatives)</div><div class="option-value">+R$ 5,000,000 | art. 4(V)</div></div></label>
+        </div>
+        <div class="info-box" style="margin-top:1rem;"><div class="info-box-text">Infrastructure surcharge is cumulative but capped at R$ 10,000,000 total (art. 9, II, Joint Res. 14).</div></div>
+    </td></tr></table>
+    <div id="p1p" class="info-box success" style="display:none;"><div class="info-box-title">Portion I (Cost) — Preview</div><div class="info-box-text" id="p1t"></div></div>
+    <div class="form-navigation"><button class="btn" onclick="nav(1)">Previous</button><button class="btn btn-primary" onclick="nav(3)">Next Step</button></div>
+</div></div>
+
+<!-- S3 -->
+<div class="section" id="section-3"><div class="form-card">
+    <div class="section-header">
+        <div class="section-number">Step 03 / 05</div><div class="section-title">Investment Category</div>
+        <div class="section-legal-ref">Joint Res. 14/2025, art. 10, §2, II | BCB Res. 517, art. 6</div>
+        <div class="section-description">Reflects restrictions on how the institution may deploy resources. Feeds into Portion II (Activities).</div>
+    </div>
+    <table class="question-table"><tr class="question-row"><td class="question-cell">
+        <div class="question-number">S3.1 <span class="status-badge critical">Required</span></div>
+        <div class="question-title">Investment activity category</div>
+        <div class="radio-group" id="ivg">
+            <label class="radio-option" id="opt-inv-r"><input type="radio" name="inv" value="restrita"><div class="option-content"><div class="option-title">Restricted</div><div class="option-description">Specific regulation limits investment forms. Applies to SPSAVs (art. 12, Res. 520/2025).</div><div class="option-value">R$ 5,000,000 | Art. 10, §2, II, "a"</div></div></label>
+            <label class="radio-option" id="opt-inv-l"><input type="radio" name="inv" value="livre"><div class="option-content"><div class="option-title">Unrestricted</div><div class="option-description">No specific restrictions on investment forms. Applicable to institutions with investment freedom.</div><div class="option-value">R$ 8,000,000 | Art. 10, §2, II, "b"</div></div></label>
+        </div>
+        <div class="info-box warning" id="ian" style="display:none;margin-top:1rem;"><div class="info-box-title" id="iat"></div><div class="info-box-text" id="iax"></div></div>
+    </td></tr></table>
+    <div class="form-navigation"><button class="btn" onclick="nav(2)">Previous</button><button class="btn btn-primary" onclick="nav(4)">Next Step</button></div>
+</div></div>
+
+<!-- S4 -->
+<div class="section" id="section-4"><div class="form-card">
+    <div class="section-header">
+        <div class="section-number">Step 04 / 05</div><div class="section-title">Funding Category</div>
+        <div class="section-legal-ref">Joint Res. 14/2025, art. 10, §2, III | BCB Res. 517, art. 7</div>
+        <div class="section-description">The funding factor multiplies the sum of activity and investment values (Portion II). SPSAVs cannot raise public funds except via share issuance (art. 12, II, Res. 520).</div>
+    </div>
+    <table class="question-table"><tr class="question-row"><td class="question-cell">
+        <div class="question-number">S4.1 <span class="status-badge critical">Required</span></div>
+        <div class="question-title">Funding category</div>
+        <div class="radio-group" id="cg">
+            <label class="radio-option" id="opt-cap-proprios"><input type="radio" name="cap" value="proprios"><div class="option-content"><div class="option-title">Own resources</div><div class="option-description">Operates exclusively with own capital.</div><div class="option-value">Factor: 60% | Art. 10, §2, III, "a"</div></div></label>
+            <label class="radio-option" id="opt-cap-institucional"><input type="radio" name="cap" value="institucional"><div class="option-content"><div class="option-title">Institutional resources</div><div class="option-description">Fundraising from institutional or professional investors.</div><div class="option-value">Factor: 80% | Art. 10, §2, III, "b"</div></div></label>
+            <label class="radio-option" id="opt-cap-publico"><input type="radio" name="cap" value="publico"><div class="option-content"><div class="option-title">Public resources (excl. deposits)</div><div class="option-description">General public fundraising, except deposits.</div><div class="option-value">Factor: 120% | Art. 10, §2, III, "c"</div></div></label>
+            <label class="radio-option" id="opt-cap-depositos"><input type="radio" name="cap" value="depositos"><div class="option-content"><div class="option-title">Deposits</div><div class="option-description">Public deposits. Only commercial/multiple banks.</div><div class="option-value">Factor: 200% | Art. 10, §2, III, "d"</div></div></label>
+        </div>
+    </td></tr></table>
+    <div class="form-navigation"><button class="btn" onclick="nav(3)">Previous</button><button class="btn btn-primary" onclick="nav(5)">Calculate</button></div>
+</div></div>
+
+<!-- S5 -->
+<div class="section" id="section-5"><div class="form-card">
+    <div class="section-header">
+        <div class="section-number">Result</div><div class="section-title">Estimated Minimum Capital</div>
+        <div class="section-legal-ref">Joint Res. 14/2025, art. 8 | Capital = Portion I (Cost) + Portion II (Activities)</div>
+        <div class="section-description" id="rel"></div>
+    </div>
+    <div class="result-panel">
+        <div class="result-label">Minimum Paid-In Capital</div>
+        <div class="result-value" id="rt">R$ 0</div>
+        <div style="font-size:0.75rem;color:#666;margin-bottom:2rem;" id="rf"></div>
+        <table class="breakdown-table"><thead><tr><th>Component</th><th>Value</th></tr></thead><tbody id="rb"></tbody></table>
+    </div>
+    <div style="margin-top:2.5rem;"><div class="result-title">Comparison by funding category</div><div style="font-size:0.75rem;color:#666;margin-bottom:1.5rem;">Same activity profile, varying only the funding factor (art. 10, §2, III)</div><div class="comparison-grid" id="cmpg"></div></div>
+    <div id="tb" style="margin-top:2rem;"></div>
+    <div class="info-box" style="margin-top:2rem;"><div class="info-box-title">Disclaimer</div><div class="info-box-text">This calculator implements the methodology per Joint Resolution CMN/BCB No. 14/2025 (arts. 8-10) and BCB Resolution No. 517/2025 (arts. 2-7). Values are estimates based on current regulation interpretation and do not substitute BCB's formal analysis during authorization. Subject to confirmation via detailed calculation with the complete Joint Res. 14 table and DEORF/BCB guidance.</div></div>
+    <div class="form-navigation"><button class="btn" onclick="nav(4)">Previous</button><button class="btn" onclick="nav(1)">New Simulation</button></div>
+</div></div>
+
+</div></div>
+<script>
+const ET={
+    spsav_intermediaria:{l:'SPSAV — Virtual Asset Intermediary',s:'SPSAV Intermediary',aa:['servico','intermediacao'],ba:['credito'],fi:'restrita',bc:['publico','depositos'],n:'Prohibited: credit (art. 12, I, Res. 520), public fundraising except shares (art. 12, II). Per BCB Res. 517, art. 3(II)(c).',ap:'Two-phase BCB authorization — up to 1,080 days'},
+    spsav_custodiante:{l:'SPSAV — Virtual Asset Custodian',s:'SPSAV Custodian',aa:['servico','custodia'],ba:['credito'],fi:'restrita',bc:['publico','depositos'],n:'Prohibited: credit (art. 12, I, Res. 520), public fundraising except shares (art. 12, II). Per BCB Res. 517, art. 3(III)(d).',ap:'Two-phase BCB authorization — up to 1,080 days'},
+    spsav_corretora:{l:'SPSAV — Virtual Exchange',s:'SPSAV Exchange',aa:['servico','custodia','intermediacao'],ba:['credito'],fi:'restrita',bc:['publico','depositos'],n:'Prohibited: credit (art. 12, I, Res. 520), public fundraising except shares (art. 12, II). Per BCB Res. 517, art. 3(II)(d), 3(III)(c).',ap:'Two-phase BCB authorization — up to 1,080 days'},
+    corretora_cambio:{l:'FX Broker (Corretora de Câmbio)',s:'FX Broker',aa:['servico','intermediacao'],ba:['credito'],fi:null,bc:['depositos'],n:'Virtual asset intermediation only — no custody (art. 20, par. único, Res. 520). Credit prohibited (art. 7, I, Res. 542). Per BCB Res. 517, art. 3(II)(e).',ap:'Communication to BCB + 90 days (art. 21, Res. 520)'}
+};
+const AV={servico:{l:'Services',v:1000000,r:'Art. 10, §2, I, "a"'},custodia:{l:'Custody & admin. of third-party resources',v:3000000,r:'Art. 10, §2, I, "b"'},intermediacao:{l:'Intermediation',v:5000000,r:'Art. 10, §2, I, "c"'},credito:{l:'Credit granting',v:7000000,r:'Art. 10, §2, I, "d"'}};
+const IV={restrita:{l:'Restricted',v:5000000,r:'Art. 10, §2, II, "a"'},livre:{l:'Unrestricted',v:8000000,r:'Art. 10, §2, II, "b"'}};
+const CF={proprios:{l:'Own resources',f:0.6,r:'Art. 10, §2, III, "a"'},institucional:{l:'Institutional',f:0.8,r:'Art. 10, §2, III, "b"'},publico:{l:'Public (excl. dep.)',f:1.2,r:'Art. 10, §2, III, "c"'},depositos:{l:'Deposits',f:2.0,r:'Art. 10, §2, III, "d"'}};
+const CPC=2000000,IC=5000000,ICAP=10000000;
+let S={et:null,es:'new',acts:[],ic:0,inv:null,cap:null};
+
+function nav(n){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.progress-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('section-'+n).classList.add('active');
+    document.getElementById('step-'+n).classList.add('active');
+    document.getElementById('csn').textContent=String(n).padStart(2,'0');
+    for(let i=1;i<n;i++)document.getElementById('step-'+i).classList.add('completed');
+    for(let i=n;i<=5;i++)if(i!==n)document.getElementById('step-'+i).classList.remove('completed');
+    if(n===2)applyEC();if(n===3)applyIC();if(n===4)applyCC();if(n===5)render();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.querySelectorAll('input[name="et"]').forEach(i=>{i.addEventListener('change',function(){
+    S.et=this.value;this.closest('.radio-group').querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));this.closest('.radio-option').classList.add('selected');
+    const e=ET[S.et];document.getElementById('ew').style.display='block';document.getElementById('ewt').textContent=e.s;document.getElementById('ewx').textContent=e.n+'\n\nProcess: '+e.ap;
+});});
+document.querySelectorAll('input[name="es"]').forEach(i=>{i.addEventListener('change',function(){S.es=this.value;this.closest('.radio-group').querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));this.closest('.radio-option').classList.add('selected');});});
+
+function applyEC(){
+    if(!S.et)return;const e=ET[S.et];
+    ['servico','custodia','intermediacao'].forEach(a=>{
+        const o=document.getElementById('opt-'+a),cb=o.querySelector('input');
+        o.classList.remove('disabled');o.style.opacity='';o.style.cursor='';o.style.pointerEvents='';cb.disabled=false;
+        let t=o.querySelector('.validation-tag');if(t)t.remove();
+        if(!e.aa.includes(a)){o.classList.add('disabled');o.style.opacity='0.35';o.style.cursor='not-allowed';o.style.pointerEvents='none';cb.disabled=true;cb.checked=false;o.classList.remove('selected');
+        let tg=document.createElement('span');tg.className='validation-tag blocked';tg.textContent=e.ba.includes(a)?'PROHIBITED':'NOT AUTHORIZED';o.querySelector('.option-title').appendChild(tg);}
+    });updActs();
+}
+document.querySelectorAll('input[name="act"]').forEach(cb=>cb.addEventListener('change',updActs));
+document.querySelectorAll('input[name="infra"]').forEach(cb=>{cb.addEventListener('change',function(){this.closest('.checkbox-option').classList.toggle('selected',this.checked);updActs();});});
+
+function updActs(){
+    S.acts=[];document.querySelectorAll('input[name="act"]:checked').forEach(cb=>{S.acts.push(cb.value);cb.closest('.checkbox-option').classList.add('selected');});
+    document.querySelectorAll('input[name="act"]:not(:checked)').forEach(cb=>cb.closest('.checkbox-option').classList.remove('selected'));
+    S.ic=document.querySelectorAll('input[name="infra"]:checked').length;
+    const p=document.getElementById('p1p');
+    if(S.acts.length>0){const c=S.acts.length*CPC,ic=Math.min(S.ic*IC,ICAP);p.style.display='block';document.getElementById('p1t').innerHTML=`${S.acts.length} cat. × R$ 2,000,000 = R$ ${F(c)}`+(ic>0?` + R$ ${F(ic)} (infra)`:'')+` = <strong>R$ ${F(c+ic)}</strong>`;}else p.style.display='none';
+}
+
+function applyIC(){if(!S.et)return;const e=ET[S.et],n=document.getElementById('ian');
+    if(e.fi){document.querySelector('input[name="inv"][value="'+e.fi+'"]').checked=true;document.querySelector('input[name="inv"][value="'+e.fi+'"]').closest('.radio-option').classList.add('selected');S.inv=e.fi;n.style.display='block';document.getElementById('iat').textContent='Auto-classified';document.getElementById('iax').textContent='SPSAVs are automatically classified as "Restricted" due to prohibitions in art. 12 of BCB Res. 520/2025.';}else n.style.display='none';
+}
+document.querySelectorAll('input[name="inv"]').forEach(i=>{i.addEventListener('change',function(){S.inv=this.value;this.closest('.radio-group').querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));this.closest('.radio-option').classList.add('selected');});});
+
+function applyCC(){if(!S.et)return;const e=ET[S.et];
+    ['proprios','institucional','publico','depositos'].forEach(c=>{
+        const o=document.getElementById('opt-cap-'+c),r=o.querySelector('input');o.classList.remove('disabled');o.style.opacity='';o.style.cursor='';o.style.pointerEvents='';r.disabled=false;
+        let t=o.querySelector('.validation-tag');if(t)t.remove();
+        if(e.bc.includes(c)){o.classList.add('disabled');o.style.opacity='0.35';o.style.cursor='not-allowed';o.style.pointerEvents='none';r.disabled=true;if(r.checked){r.checked=false;o.classList.remove('selected');S.cap=null;}let tg=document.createElement('span');tg.className='validation-tag blocked';tg.textContent='PROHIBITED';o.querySelector('.option-title').appendChild(tg);}
+    });
+}
+document.querySelectorAll('input[name="cap"]').forEach(i=>{i.addEventListener('change',function(){S.cap=this.value;this.closest('.radio-group').querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));this.closest('.radio-option').classList.add('selected');});});
+
+function calc(ao,io,co){
+    const a=ao||S.acts,inv=io||S.inv,cap=co||S.cap;
+    const n=a.length,cb=n*CPC,ic=Math.min(S.ic*IC,ICAP),p1=cb+ic;
+    let as=0;a.forEach(x=>as+=AV[x].v);
+    const iv=inv?IV[inv].v:0,f=cap?CF[cap].f:1,p2=(as+iv)*f;
+    return{p1,p2,t:p1+p2,cb,ic,n,as,iv,f,cap};
+}
+
+function render(){
+    const r=calc(),e=ET[S.et]||{l:'Not selected',s:'—'};
+    document.getElementById('rel').textContent=`${e.l} | ${S.acts.length} activity cat. | Funding: ${S.cap?CF[S.cap].l:'—'}`;
+    document.getElementById('rt').textContent='R$ '+F(r.t);
+    document.getElementById('rf').textContent=`Portion I (R$ ${F(r.p1)}) + Portion II (R$ ${F(r.p2)}) = R$ ${F(r.t)}`;
+    let rows='';
+    rows+=`<tr><td colspan="2" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#999;padding-top:1.5rem;">Portion I — Cost (Art. 9, Joint Res. 14)</td></tr>`;
+    rows+=`<tr><td>${r.n} cat. × R$ 2,000,000<span class="ref">Art. 9, I</span></td><td>R$ ${F(r.cb)}</td></tr>`;
+    if(r.ic>0)rows+=`<tr><td>Tech infrastructure (${S.ic} svc, cap R$ 10M)<span class="ref">Art. 9, II</span></td><td>R$ ${F(r.ic)}</td></tr>`;
+    rows+=`<tr style="font-weight:500"><td>Subtotal Portion I</td><td>R$ ${F(r.p1)}</td></tr>`;
+    rows+=`<tr><td colspan="2" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#999;padding-top:1.5rem;">Portion II — Activities (Art. 10, Joint Res. 14)</td></tr>`;
+    S.acts.forEach(a=>{const v=AV[a];rows+=`<tr><td>${v.l}<span class="ref">${v.r}</span></td><td>R$ ${F(v.v)}</td></tr>`;});
+    if(S.inv){const v=IV[S.inv];rows+=`<tr><td>Investment: ${v.l}<span class="ref">${v.r}</span></td><td>R$ ${F(v.v)}</td></tr>`;}
+    rows+=`<tr><td>Subtotal (activities + investment)</td><td>R$ ${F(r.as+r.iv)}</td></tr>`;
+    if(S.cap){const v=CF[S.cap];rows+=`<tr><td>Funding factor: ${v.l} (${(v.f*100).toFixed(0)}%)<span class="ref">${v.r}</span></td><td>× ${v.f.toFixed(2)}</td></tr>`;}
+    rows+=`<tr style="font-weight:500"><td>Subtotal Portion II</td><td>R$ ${F(r.p2)}</td></tr>`;
+    rows+=`<tr class="total"><td>Minimum Capital</td><td>R$ ${F(r.t)}</td></tr>`;
+    document.getElementById('rb').innerHTML=rows;
+    let ch='';const bl=(ET[S.et]||{}).bc||[];
+    ['proprios','institucional','publico','depositos'].forEach(c=>{if(bl.includes(c))return;const x=calc(null,null,c),sel=c===S.cap;
+        ch+=`<div class="comparison-card ${sel?'highlighted':''}"><div class="comparison-card-title">${CF[c].l} (${(CF[c].f*100).toFixed(0)}%)</div><div class="comparison-card-value">R$ ${F(x.t)}</div><div class="comparison-card-detail">Portion I: R$ ${F(x.p1)}<br>Portion II: R$ ${F(x.p2)}${sel?'<br><strong>← Selected</strong>':''}</div></div>`;
+    });document.getElementById('cmpg').innerHTML=ch;
+    const tb=document.getElementById('tb');
+    if(S.es==='new'||S.es==='spsav_active'){tb.innerHTML=`<div class="info-box critical"><div class="info-box-title">Transition Rule — NOT APPLICABLE</div><div class="info-box-text">${S.es==='spsav_active'?'Joint Res. 14/2025 took effect 11/04/2025. BCB Res. 519 (SPSAVs) published 11/10/2025 — after Joint Res. 14. No prior capital regulation for SPSAVs existed, so no transition basis (art. 12, I).':'New entity with no prior authorization before 11/04/2025. Full capital required from filing.'}</div></div>`;}
+    else{tb.innerHTML=`<div class="info-box warning"><div class="info-box-title">Transition Rule — POTENTIALLY APPLICABLE</div><div class="info-box-text">Entity operating before 11/04/2025. Per art. 12, Joint Res. 14/2025:<br>• Until 06/30/2026: maintain prior capital<br>• 07/01/2026–06/30/2027: greater of prior or 50% of new<br>• 07/01/2027–06/30/2028: greater of prior or 75% of new<br>• From 07/01/2028: full new methodology<br><br>Applicability must be verified case-by-case.</div></div>`;}
+}
+
+function F(v){return v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});}
+
+document.querySelectorAll('.radio-option input[type="radio"]').forEach(i=>{i.addEventListener('change',function(){const g=this.closest('.radio-group');g.querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));if(this.checked)this.closest('.radio-option').classList.add('selected');});});
+document.querySelectorAll('.checkbox-option input[type="checkbox"]').forEach(i=>{i.addEventListener('change',function(){this.closest('.checkbox-option').classList.toggle('selected',this.checked);});});
+</script>
+</body></html>
