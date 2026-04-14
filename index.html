@@ -137,6 +137,7 @@
             <label class="checkbox-option" id="opt-servico"><input type="checkbox" name="act" value="servico"><div class="option-content"><div class="option-title">Services</div><div class="option-description">Non-financial-flow services or services on behalf of third parties: advisory, technical assistance, data aggregation, fiduciary agent, payment initiation, etc. — BCB Res. 517, art. 2(IV)</div><div class="option-value">+R$ 2,000,000 to cost</div></div></label>
             <label class="checkbox-option" id="opt-custodia"><input type="checkbox" name="act" value="custodia"><div class="option-content"><div class="option-title">Custody & Administration of Third-Party Resources</div><div class="option-description">Custody of securities/virtual assets; professional management of third-party assets; fund/portfolio administration — BCB Res. 517, art. 2(III)</div><div class="option-value">+R$ 2,000,000 to cost</div></div></label>
             <label class="checkbox-option" id="opt-intermediacao"><input type="checkbox" name="act" value="intermediacao"><div class="option-content"><div class="option-title">Intermediation</div><div class="option-description">Buy/sell on behalf of third parties (securities, FX, virtual assets); electronic money issuance; payments & international transfers; credentialing — BCB Res. 517, art. 2(II)</div><div class="option-value">+R$ 2,000,000 to cost</div></div></label>
+            <label class="checkbox-option" id="opt-cambio"><input type="checkbox" name="fx" value="1"><div class="option-content"><div class="option-title">FX Operations (Câmbio)</div><div class="option-description">FX market operations including eFX with virtual assets (payment or international transfer). Adds +1 category to Portion I (Cost) only — does not add a fixed value to Portion II (Activities).</div><div class="option-value">+R$ 2,000,000 to Portion I only | BCB Res. 521/2025, art. 76-A | BCB Res. 542/2025, art. 2</div></div></label>
             <label class="checkbox-option disabled" id="opt-credito" style="opacity:0.35;cursor:not-allowed;pointer-events:none;"><input type="checkbox" name="act" value="credito" disabled><div class="option-content"><div class="option-title">Credit Granting <span class="validation-tag blocked">DISABLED</span></div><div class="option-description">Loans, financing, advances, credit limits, leasing, guarantees, receivables acquisition — BCB Res. 517, art. 2(I). Prohibited for SPSAVs (art. 12, I, Res. 520) and FX Brokers (art. 7, I, Res. 542). Under validation for other entity types.</div><div class="option-value">+R$ 2,000,000 to cost | Not available in this version</div></div></label>
         </div>
     </td></tr>
@@ -181,7 +182,7 @@
     <div class="section-header">
         <div class="section-number">Step 04 / 05</div><div class="section-title">Funding Category</div>
         <div class="section-legal-ref">Joint Res. 14/2025, art. 10, §2, III | BCB Res. 517, art. 7</div>
-        <div class="section-description">The funding factor multiplies the sum of activity and investment values (Portion II). SPSAVs cannot raise public funds except via share issuance (art. 12, II, Res. 520).</div>
+        <div class="section-description">The funding factor is automatically set to the highest permitted category for the selected entity type, per BCB Res. 517/2025, art. 7, §1, II ("the category with the highest associated factor"). User selection is available for reference but the system enforces the regulatory maximum.</div>
     </div>
     <table class="question-table"><tr class="question-row"><td class="question-cell">
         <div class="question-number">S4.1 <span class="status-badge critical">Required</span></div>
@@ -218,16 +219,16 @@
 </div></div>
 <script>
 const ET={
-    spsav_intermediaria:{l:'SPSAV — Virtual Asset Intermediary',s:'SPSAV Intermediary',aa:['servico','intermediacao'],ba:['credito'],fi:'restrita',bc:['publico','depositos'],n:'Prohibited: credit (art. 12, I, Res. 520), public fundraising except shares (art. 12, II). Per BCB Res. 517, art. 3(II)(c).',ap:'Two-phase BCB authorization — up to 1,080 days'},
-    spsav_custodiante:{l:'SPSAV — Virtual Asset Custodian',s:'SPSAV Custodian',aa:['servico','custodia'],ba:['credito'],fi:'restrita',bc:['publico','depositos'],n:'Prohibited: credit (art. 12, I, Res. 520), public fundraising except shares (art. 12, II). Per BCB Res. 517, art. 3(III)(d).',ap:'Two-phase BCB authorization — up to 1,080 days'},
-    spsav_corretora:{l:'SPSAV — Virtual Exchange',s:'SPSAV Exchange',aa:['servico','custodia','intermediacao'],ba:['credito'],fi:'restrita',bc:['publico','depositos'],n:'Prohibited: credit (art. 12, I, Res. 520), public fundraising except shares (art. 12, II). Per BCB Res. 517, art. 3(II)(d), 3(III)(c).',ap:'Two-phase BCB authorization — up to 1,080 days'},
-    corretora_cambio:{l:'FX Broker (Corretora de Câmbio)',s:'FX Broker',aa:['servico','intermediacao'],ba:['credito'],fi:null,bc:['depositos'],n:'Virtual asset intermediation only — no custody (art. 20, par. único, Res. 520). Credit prohibited (art. 7, I, Res. 542). Per BCB Res. 517, art. 3(II)(e).',ap:'Communication to BCB + 90 days (art. 21, Res. 520)'}
+    spsav_intermediaria:{l:'SPSAV — Virtual Asset Intermediary',s:'SPSAV Intermediary',aa:['servico','intermediacao'],ba:['credito'],fi:'restrita',bc:['publico','depositos'],mc:'proprios',fx:true,n:'Prohibited: credit (art. 12, I, Res. 520), public fundraising except shares (art. 12, II). Per BCB Res. 517, art. 3(II)(c).',ap:'Two-phase BCB authorization — up to 1,080 days'},
+    spsav_custodiante:{l:'SPSAV — Virtual Asset Custodian',s:'SPSAV Custodian',aa:['servico','custodia'],ba:['credito'],fi:'restrita',bc:['publico','depositos'],mc:'proprios',fx:false,n:'Prohibited: credit (art. 12, I, Res. 520), public fundraising except shares (art. 12, II). Per BCB Res. 517, art. 3(III)(d).',ap:'Two-phase BCB authorization — up to 1,080 days'},
+    spsav_corretora:{l:'SPSAV — Virtual Exchange',s:'SPSAV Exchange',aa:['servico','custodia','intermediacao'],ba:['credito'],fi:'restrita',bc:['publico','depositos'],mc:'proprios',fx:true,n:'Prohibited: credit (art. 12, I, Res. 520), public fundraising except shares (art. 12, II). Per BCB Res. 517, art. 3(II)(d), 3(III)(c).',ap:'Two-phase BCB authorization — up to 1,080 days'},
+    corretora_cambio:{l:'FX Broker (Corretora de Câmbio)',s:'FX Broker',aa:['servico','intermediacao'],ba:['credito'],fi:null,bc:['depositos'],mc:'institucional',fx:true,n:'Virtual asset intermediation only — no custody (art. 20, par. único, Res. 520). Credit prohibited (art. 7, I, Res. 542). Per BCB Res. 517, art. 3(II)(e).',ap:'Communication to BCB + 90 days (art. 21, Res. 520)'}
 };
 const AV={servico:{l:'Services',v:1000000,r:'Art. 10, §2, I, "a"'},custodia:{l:'Custody & admin. of third-party resources',v:3000000,r:'Art. 10, §2, I, "b"'},intermediacao:{l:'Intermediation',v:5000000,r:'Art. 10, §2, I, "c"'},credito:{l:'Credit granting',v:7000000,r:'Art. 10, §2, I, "d"'}};
 const IV={restrita:{l:'Restricted',v:5000000,r:'Art. 10, §2, II, "a"'},livre:{l:'Unrestricted',v:8000000,r:'Art. 10, §2, II, "b"'}};
 const CF={proprios:{l:'Own resources',f:0.6,r:'Art. 10, §2, III, "a"'},institucional:{l:'Institutional',f:0.8,r:'Art. 10, §2, III, "b"'},publico:{l:'Public (excl. dep.)',f:1.2,r:'Art. 10, §2, III, "c"'},depositos:{l:'Deposits',f:2.0,r:'Art. 10, §2, III, "d"'}};
 const CPC=2000000,IC=5000000,ICAP=10000000;
-let S={et:null,es:'new',acts:[],ic:0,inv:null,cap:null};
+let S={et:null,es:'new',acts:[],ic:0,inv:null,cap:null,fx:false};
 
 function nav(n){
     document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -245,6 +246,7 @@ document.querySelectorAll('input[name="et"]').forEach(i=>{i.addEventListener('ch
     S.et=this.value;this.closest('.radio-group').querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));this.closest('.radio-option').classList.add('selected');
     const e=ET[S.et];document.getElementById('ew').style.display='block';document.getElementById('ewt').textContent=e.s;document.getElementById('ewx').textContent=e.n+'\n\nProcess: '+e.ap;
 });});
+document.querySelector('input[name="fx"]').addEventListener('change',function(){S.fx=this.checked;this.closest('.checkbox-option').classList.toggle('selected',this.checked);updActs();});
 document.querySelectorAll('input[name="es"]').forEach(i=>{i.addEventListener('change',function(){S.es=this.value;this.closest('.radio-group').querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));this.closest('.radio-option').classList.add('selected');});});
 
 function applyEC(){
@@ -255,7 +257,13 @@ function applyEC(){
         let t=o.querySelector('.validation-tag');if(t)t.remove();
         if(!e.aa.includes(a)){o.classList.add('disabled');o.style.opacity='0.35';o.style.cursor='not-allowed';o.style.pointerEvents='none';cb.disabled=true;cb.checked=false;o.classList.remove('selected');
         let tg=document.createElement('span');tg.className='validation-tag blocked';tg.textContent=e.ba.includes(a)?'PROHIBITED':'NOT AUTHORIZED';o.querySelector('.option-title').appendChild(tg);}
-    });updActs();
+    });
+    const fxOpt=document.getElementById('opt-cambio'),fxCb=fxOpt.querySelector('input[name="fx"]');
+    let fxTag=fxOpt.querySelector('.validation-tag');if(fxTag)fxTag.remove();
+    fxOpt.classList.remove('disabled');fxOpt.style.opacity='';fxOpt.style.cursor='';fxOpt.style.pointerEvents='';fxCb.disabled=false;
+    if(!e.fx){fxOpt.classList.add('disabled');fxOpt.style.opacity='0.35';fxOpt.style.cursor='not-allowed';fxOpt.style.pointerEvents='none';fxCb.disabled=true;fxCb.checked=false;S.fx=false;fxOpt.classList.remove('selected');
+    let tg=document.createElement('span');tg.className='validation-tag blocked';tg.textContent='NOT AUTHORIZED';fxOpt.querySelector('.option-title').appendChild(tg);}
+    updActs();
 }
 document.querySelectorAll('input[name="act"]').forEach(cb=>cb.addEventListener('change',updActs));
 document.querySelectorAll('input[name="infra"]').forEach(cb=>{cb.addEventListener('change',function(){this.closest('.checkbox-option').classList.toggle('selected',this.checked);updActs();});});
@@ -265,7 +273,8 @@ function updActs(){
     document.querySelectorAll('input[name="act"]:not(:checked)').forEach(cb=>cb.closest('.checkbox-option').classList.remove('selected'));
     S.ic=document.querySelectorAll('input[name="infra"]:checked').length;
     const p=document.getElementById('p1p');
-    if(S.acts.length>0){const c=S.acts.length*CPC,ic=Math.min(S.ic*IC,ICAP);p.style.display='block';document.getElementById('p1t').innerHTML=`${S.acts.length} cat. × R$ 2,000,000 = R$ ${F(c)}`+(ic>0?` + R$ ${F(ic)} (infra)`:'')+` = <strong>R$ ${F(c+ic)}</strong>`;}else p.style.display='none';
+    const totalCats=S.acts.length+(S.fx?1:0);
+    if(totalCats>0){const c=totalCats*CPC,ic=Math.min(S.ic*IC,ICAP);p.style.display='block';document.getElementById('p1t').innerHTML=`${totalCats} cat.${S.fx?' (incl. FX)':''} × R$ 2,000,000 = R$ ${F(c)}`+(ic>0?` + R$ ${F(ic)} (infra)`:'')+` = <strong>R$ ${F(c+ic)}</strong>`;}else p.style.display='none';
 }
 
 function applyIC(){if(!S.et)return;const e=ET[S.et],n=document.getElementById('ian');
@@ -274,20 +283,31 @@ function applyIC(){if(!S.et)return;const e=ET[S.et],n=document.getElementById('i
 document.querySelectorAll('input[name="inv"]').forEach(i=>{i.addEventListener('change',function(){S.inv=this.value;this.closest('.radio-group').querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));this.closest('.radio-option').classList.add('selected');});});
 
 function applyCC(){if(!S.et)return;const e=ET[S.et];
+    const order=['depositos','publico','institucional','proprios'];
+    let autoSelected=null;
     ['proprios','institucional','publico','depositos'].forEach(c=>{
-        const o=document.getElementById('opt-cap-'+c),r=o.querySelector('input');o.classList.remove('disabled');o.style.opacity='';o.style.cursor='';o.style.pointerEvents='';r.disabled=false;
+        const o=document.getElementById('opt-cap-'+c),r=o.querySelector('input');o.classList.remove('disabled');o.style.opacity='';o.style.cursor='';o.style.pointerEvents='';r.disabled=false;r.checked=false;o.classList.remove('selected');
         let t=o.querySelector('.validation-tag');if(t)t.remove();
-        if(e.bc.includes(c)){o.classList.add('disabled');o.style.opacity='0.35';o.style.cursor='not-allowed';o.style.pointerEvents='none';r.disabled=true;if(r.checked){r.checked=false;o.classList.remove('selected');S.cap=null;}let tg=document.createElement('span');tg.className='validation-tag blocked';tg.textContent='PROHIBITED';o.querySelector('.option-title').appendChild(tg);}
+        if(e.bc.includes(c)){o.classList.add('disabled');o.style.opacity='0.35';o.style.cursor='not-allowed';o.style.pointerEvents='none';r.disabled=true;let tg=document.createElement('span');tg.className='validation-tag blocked';tg.textContent='PROHIBITED';o.querySelector('.option-title').appendChild(tg);}
     });
+    for(const c of order){if(!e.bc.includes(c)){autoSelected=c;break;}}
+    if(autoSelected){
+        const o=document.getElementById('opt-cap-'+autoSelected),r=o.querySelector('input');
+        r.checked=true;o.classList.add('selected');S.cap=autoSelected;
+        let existing=document.getElementById('cap-auto-note');if(existing)existing.remove();
+        const note=document.createElement('div');note.id='cap-auto-note';note.className='info-box warning';note.style.marginTop='1rem';
+        note.innerHTML=`<div class="info-box-title">Auto-selected: ${CF[autoSelected].l} (${(CF[autoSelected].f*100).toFixed(0)}%)</div><div class="info-box-text">Per BCB Res. 517/2025, art. 7, §1, II: the funding category must be "the category with the highest associated factor" among all permitted sources. For ${e.s}, the highest permitted factor is ${(CF[autoSelected].f*100).toFixed(0)}% (${CF[autoSelected].l}).</div>`;
+        document.getElementById('cg').parentNode.appendChild(note);
+    }
 }
 document.querySelectorAll('input[name="cap"]').forEach(i=>{i.addEventListener('change',function(){S.cap=this.value;this.closest('.radio-group').querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));this.closest('.radio-option').classList.add('selected');});});
 
 function calc(ao,io,co){
     const a=ao||S.acts,inv=io||S.inv,cap=co||S.cap;
-    const n=a.length,cb=n*CPC,ic=Math.min(S.ic*IC,ICAP),p1=cb+ic;
+    const n=a.length+(S.fx?1:0),cb=n*CPC,ic=Math.min(S.ic*IC,ICAP),p1=cb+ic;
     let as=0;a.forEach(x=>as+=AV[x].v);
     const iv=inv?IV[inv].v:0,f=cap?CF[cap].f:1,p2=(as+iv)*f;
-    return{p1,p2,t:p1+p2,cb,ic,n,as,iv,f,cap};
+    return{p1,p2,t:p1+p2,cb,ic,n,as,iv,f,cap,nActs:a.length};
 }
 
 function render(){
@@ -297,7 +317,7 @@ function render(){
     document.getElementById('rf').textContent=`Portion I (R$ ${F(r.p1)}) + Portion II (R$ ${F(r.p2)}) = R$ ${F(r.t)}`;
     let rows='';
     rows+=`<tr><td colspan="2" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#999;padding-top:1.5rem;">Portion I — Cost (Art. 9, Joint Res. 14)</td></tr>`;
-    rows+=`<tr><td>${r.n} cat. × R$ 2,000,000<span class="ref">Art. 9, I</span></td><td>R$ ${F(r.cb)}</td></tr>`;
+    rows+=`<tr><td>${r.nActs} activity cat.${S.fx?' + 1 FX cat.':''} = ${r.n} total × R$ 2,000,000<span class="ref">Art. 9, I</span></td><td>R$ ${F(r.cb)}</td></tr>`;
     if(r.ic>0)rows+=`<tr><td>Tech infrastructure (${S.ic} svc, cap R$ 10M)<span class="ref">Art. 9, II</span></td><td>R$ ${F(r.ic)}</td></tr>`;
     rows+=`<tr style="font-weight:500"><td>Subtotal Portion I</td><td>R$ ${F(r.p1)}</td></tr>`;
     rows+=`<tr><td colspan="2" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;color:#999;padding-top:1.5rem;">Portion II — Activities (Art. 10, Joint Res. 14)</td></tr>`;
